@@ -1,0 +1,368 @@
+<!doctype html>
+<html lang="hy">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Nara Nails</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+  :root {
+    --bg: #fbf6f3;
+    --card: #ffffff;
+    --text: #2b1f1d;
+    --muted: #8c7a75;
+    --line: #efe3de;
+    --accent: #c9787a;
+    --accent-2: #e8b4a8;
+    --accent-soft: #f7e4df;
+    --ok: #5a9e7a;
+    --shadow: 0 6px 24px rgba(120, 70, 60, .08);
+  }
+  :root.dark {
+    --bg: #1b1617;
+    --card: #262021;
+    --text: #f5ece9;
+    --muted: #a8958f;
+    --line: #382e2f;
+    --accent: #e0989a;
+    --accent-2: #b8736c;
+    --accent-soft: #3a2a2b;
+    --shadow: 0 6px 24px rgba(0, 0, 0, .3);
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; background: var(--bg); color: var(--text);
+    font: 16px/1.4 system-ui, -apple-system, "Segoe UI", "Noto Sans Armenian", Roboto, sans-serif; }
+  body { min-height: 100vh; }
+  .wrap { max-width: 480px; margin: 0 auto; padding: 16px 16px 100px; }
+  .screen { animation: in .28s ease; }
+  @keyframes in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+  /* hero */
+  .hero { text-align: center; padding: 28px 16px 22px; border-radius: 24px;
+    background: linear-gradient(135deg, var(--accent-2), var(--accent)); color: #fff; box-shadow: var(--shadow); }
+  .hero .logo { font-size: 44px; }
+  .hero h1 { margin: 6px 0 2px; font-size: 26px; letter-spacing: .5px; }
+  .hero p { margin: 0; opacity: .92; font-size: 14px; }
+
+  .btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%;
+    border: 0; border-radius: 16px; padding: 16px; font: inherit; font-weight: 600; cursor: pointer;
+    background: var(--accent); color: #fff; box-shadow: var(--shadow); transition: transform .1s; }
+  .btn:active { transform: scale(.98); }
+  .btn.ghost { background: var(--card); color: var(--accent); }
+  .btn[disabled] { opacity: .5; }
+  .book-btn { margin: 16px 0; font-size: 18px; padding: 18px; }
+
+  .tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .tile { background: var(--card); border-radius: 18px; padding: 16px; box-shadow: var(--shadow);
+    cursor: pointer; transition: transform .1s; border: 0; font: inherit; color: inherit; text-align: left; }
+  .tile:active { transform: scale(.97); }
+  .tile .ic { font-size: 26px; }
+  .tile .t { font-weight: 600; margin-top: 6px; }
+  .tile .s { color: var(--muted); font-size: 13px; }
+  .tile.wide { grid-column: span 2; display: flex; align-items: center; gap: 12px; }
+  .tile.wide .t { margin: 0; }
+
+  .card { background: var(--card); border-radius: 18px; padding: 16px; box-shadow: var(--shadow); margin-bottom: 12px; }
+  .mybook { border: 2px solid var(--accent-2); }
+  .mybook .lbl { color: var(--accent); font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: .5px; }
+  .mybook .big { font-size: 18px; font-weight: 600; margin: 4px 0; }
+  .muted { color: var(--muted); font-size: 14px; }
+
+  h2 { font-size: 22px; margin: 8px 0 14px; }
+  .steps { display: flex; gap: 6px; margin-bottom: 14px; }
+  .steps i { flex: 1; height: 4px; border-radius: 2px; background: var(--line); }
+  .steps i.on { background: var(--accent); }
+
+  .svc { display: flex; align-items: center; gap: 14px; width: 100%; text-align: left; border: 2px solid transparent; }
+  .svc .em { width: 48px; height: 48px; border-radius: 14px; background: var(--accent-soft);
+    display: grid; place-items: center; font-size: 24px; flex: none; }
+  .svc .nm { font-weight: 600; font-size: 17px; }
+  .svc .pr { margin-left: auto; font-weight: 700; color: var(--accent); white-space: nowrap; }
+
+  /* calendar */
+  .cal-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .cal-head b { font-size: 18px; }
+  .cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+  .cal .wd { text-align: center; font-size: 12px; color: var(--muted); padding: 4px 0; }
+  .day { aspect-ratio: 1; border-radius: 12px; border: 0; font: inherit; font-weight: 600;
+    background: var(--accent-soft); color: var(--text); cursor: pointer; position: relative; transition: transform .1s; }
+  .day:active { transform: scale(.92); }
+  .day.off { background: transparent; color: var(--muted); opacity: .45; cursor: default; font-weight: 400; }
+  .day.today::after { content: ""; position: absolute; left: 50%; bottom: 5px; width: 4px; height: 4px;
+    margin-left: -2px; border-radius: 50%; background: var(--accent); }
+  .day.sel { background: var(--accent); color: #fff; }
+  .legend { display: flex; gap: 14px; margin-top: 12px; font-size: 12px; color: var(--muted); }
+  .legend span::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 3px;
+    margin-right: 5px; vertical-align: -1px; background: var(--accent-soft); }
+  .legend span.x::before { background: transparent; border: 1px solid var(--line); }
+
+  .group { margin-bottom: 16px; }
+  .group .gl { font-size: 13px; color: var(--muted); margin-bottom: 8px; }
+  .chips { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .chip { border: 0; border-radius: 12px; padding: 12px 0; font: inherit; font-weight: 600;
+    background: var(--card); color: var(--text); box-shadow: var(--shadow); cursor: pointer; transition: all .12s; }
+  .chip.sel { background: var(--accent); color: #fff; transform: scale(1.04); }
+
+  .sum-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--line); }
+  .sum-row:last-child { border: 0; }
+  .sum-row span { color: var(--muted); }
+  .sum-row b { text-align: right; }
+
+  .price-row { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+  .price-row:last-child { border: 0; }
+  .price-row .pr { margin-left: auto; font-weight: 700; color: var(--accent); }
+
+  .banner { background: var(--accent-soft); border-radius: 14px; padding: 12px 14px; margin-bottom: 12px;
+    font-size: 14px; display: flex; align-items: center; gap: 10px; }
+  .banner button { margin-left: auto; border: 0; background: var(--accent); color: #fff; border-radius: 10px;
+    padding: 8px 12px; font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+  .empty { text-align: center; padding: 30px 10px; color: var(--muted); }
+  .back { border: 0; background: none; color: var(--accent); font: inherit; font-weight: 600; padding: 4px 0 10px; cursor: pointer; }
+  a.btn { text-decoration: none; }
+  .stack > * + * { margin-top: 10px; }
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+
+<script>
+const tg = window.Telegram && window.Telegram.WebApp;
+const inTelegram = !!(tg && tg.initData);
+
+/* ---------- data from the bot (in ?d=) or demo data for local preview ---------- */
+function decode(s) {
+  s = s.replace(/-/g, "+").replace(/_/g, "/");
+  while (s.length % 4) s += "=";
+  const bytes = Uint8Array.from(atob(s), c => c.charCodeAt(0));
+  return JSON.parse(new TextDecoder().decode(bytes));
+}
+const DEMO = {
+  g: Date.now(), m: null, days: null, busy: {}, b: null,
+  svc: [["gel","Գել-լաք",3000,90],["clean","Մաքրում",1000,45],["fill","Լիցք",5000,150],["pedi","Պեդիկյուր",5000,90]],
+  ph: "+374 91 743 389", ig: "nara_nailartist", ad: "ք. Վանաձոր, Զորավար Անդրանիկի 95",
+  gm: "https://www.google.com/maps/search/?api=1&query=Vanadzor%2C%20Zoravar%20Andranik%2095",
+  ym: "https://yandex.com/maps/?text=Vanadzor%2C%20Zoravar%20Andranik%2095",
+};
+let D;
+try { D = decode(new URLSearchParams(location.search).get("d")); } catch (e) { D = DEMO; }
+
+const SVC_EMOJI = { gel: "💅", clean: "✨", fill: "💎", pedi: "🦶" };
+const MONTHS = ["Հունվար","Փետրվար","Մարտ","Ապրիլ","Մայիս","Հունիս","Հուլիս","Օգոստոս","Սեպտեմբեր","Հոկտեմբեր","Նոյեմբեր","Դեկտեմբեր"];
+const WD = ["Երկ","Երք","Չրք","Հնգ","Ուր","Շբթ","Կիր"];
+const WD_LONG = ["Երկուշաբթի","Երեքշաբթի","Չորեքշաբթի","Հինգշաբթի","Ուրբաթ","Շաբաթ","Կիրակի"];
+const OPEN = 9 * 60, CLOSE = 19 * 60, STEP = 30, STALE_MS = 15 * 60 * 1000;
+
+/* ---------- time (Asia/Yerevan, same rules as the bot) ---------- */
+function nowYerevan() {
+  const p = Object.fromEntries(new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Yerevan", year: "numeric", month: "2-digit", day: "2-digit",
+    hour: "2-digit", minute: "2-digit", hourCycle: "h23",
+  }).formatToParts(new Date()).map(x => [x.type, x.value]));
+  return { y: +p.year, m: +p.month, d: +p.day, min: +p.hour * 60 + +p.minute };
+}
+const NOW = nowYerevan();
+const [YEAR, MONTH] = D.m ? D.m.split("-").map(Number) : [NOW.y, NOW.m];
+const DAYS_IN_MONTH = new Date(YEAR, MONTH, 0).getDate();
+const OPEN_DAYS = new Set(D.days || Array.from({ length: DAYS_IN_MONTH }, (_, i) => i + 1).filter(d => d >= NOW.d));
+const stale = Date.now() - D.g > STALE_MS || YEAR !== NOW.y || MONTH !== NOW.m;
+
+const pad = n => String(n).padStart(2, "0");
+const hm = min => `${pad(Math.floor(min / 60))}:${pad(min % 60)}`;
+const svc = key => { const s = D.svc.find(x => x[0] === key); return { key: s[0], name: s[1], price: s[2], min: s[3] }; };
+const dur = min => { const h = Math.floor(min / 60), m = min % 60; return h && m ? `${h},${m * 10 / 60} ժամ` : h ? `${h} ժամ` : `${m} րոպե`; };
+const money = n => n.toLocaleString("ru-RU") + " դր.";
+const weekday = d => (new Date(YEAR, MONTH - 1, d).getDay() + 6) % 7;
+const isPastDay = d => YEAR < NOW.y || (YEAR === NOW.y && (MONTH < NOW.m || (MONTH === NOW.m && d < NOW.d)));
+const isToday = d => YEAR === NOW.y && MONTH === NOW.m && d === NOW.d;
+
+function starts(day, minutes) {
+  if (!OPEN_DAYS.has(day) || isPastDay(day)) return [];
+  const busy = D.busy[day] || [];
+  const out = [];
+  for (let s = OPEN; s + minutes <= CLOSE; s += STEP) {
+    if (isToday(day) && s <= NOW.min) continue;
+    if (busy.every(([b0, b1]) => s + minutes <= b0 || s >= b1)) out.push(s);
+  }
+  return out;
+}
+
+/* ---------- helpers ---------- */
+const app = document.getElementById("app");
+const state = { screen: "home", svc: null, day: null, time: null };
+const haptic = t => tg && tg.HapticFeedback && tg.HapticFeedback.selectionChanged && tg.HapticFeedback.selectionChanged();
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+function send(obj) {
+  if (inTelegram) tg.sendData(JSON.stringify(obj));
+  else alert("Telegram-ից դուրս (preview)\n" + JSON.stringify(obj));
+}
+function openLink(url) { tg && tg.openLink ? tg.openLink(url) : window.open(url, "_blank"); }
+function go(screen, patch = {}) { Object.assign(state, patch, { screen }); haptic(); render(); window.scrollTo(0, 0); }
+
+const BACK = { services: "home", calendar: "services", times: "calendar", confirm: "times",
+               prices: "home", address: "home", phone: "home" };
+
+function setupTelegramButtons() {
+  if (!tg) return;
+  if (BACK[state.screen]) tg.BackButton.show(); else tg.BackButton.hide();
+  const mb = tg.MainButton;
+  if (state.screen === "confirm") {
+    mb.setParams({ text: "✅ Հաստատել գրանցումը", color: getComputedStyle(document.documentElement).getPropertyValue("--accent").trim(), text_color: "#ffffff", is_visible: true, is_active: true });
+  } else mb.hide();
+}
+function confirmBooking() {
+  const t = `${YEAR}-${pad(MONTH)}-${pad(state.day)}T${hm(state.time)}`;
+  send({ a: "book", s: state.svc, t });
+}
+if (tg) {
+  tg.ready(); tg.expand();
+  if (tg.colorScheme === "dark") document.documentElement.classList.add("dark");
+  tg.BackButton.onClick(() => go(BACK[state.screen] || "home"));
+  tg.MainButton.onClick(confirmBooking);
+} else if (matchMedia("(prefers-color-scheme: dark)").matches) document.documentElement.classList.add("dark");
+
+const steps = n => `<div class="steps">${[1,2,3,4].map(i => `<i class="${i <= n ? "on" : ""}"></i>`).join("")}</div>`;
+const backLink = () => inTelegram ? "" : `<button class="back" data-go="${BACK[state.screen]}">‹ Հետ</button>`;
+const staleBanner = () => stale ? `<div class="banner">⏳ Ժամերը կարող են փոխված լինել։<button data-act="refresh">Թարմացնել</button></div>` : "";
+
+/* ---------- screens ---------- */
+const screens = {
+  home() {
+    let my = "";
+    if (D.b) {
+      const s = svc(D.b.s), [d, t] = D.b.t.split("T"), [y, m, dd] = d.split("-").map(Number);
+      my = `<div class="card mybook">
+        <div class="lbl">Ձեր գրանցումը</div>
+        <div class="big">${SVC_EMOJI[s.key] || "💅"} ${esc(s.name)}</div>
+        <div>${dd} ${MONTHS[m - 1]}, ${WD_LONG[(new Date(y, m - 1, dd).getDay() + 6) % 7]} · <b>${t}</b></div>
+        <p class="muted">Նոր գրանցման համար զանգահարեք վարպետին՝ ${esc(D.ph)}</p>
+        <button class="btn ghost" data-act="cancel">❌ Չեղարկել գրանցումը</button>
+      </div>`;
+    }
+    return `
+      <div class="hero"><div class="logo">💅</div><h1>Nara Nails</h1><p>Մատնահարդարում · Վանաձոր</p></div>
+      ${D.b ? `<div style="height:16px"></div>${my}` :
+        `<button class="btn book-btn" data-go="services">📅 Գրանցվել</button>`}
+      <div class="tiles">
+        <button class="tile" data-go="prices"><div class="ic">💰</div><div class="t">Գներ</div><div class="s">Ծառայություններ</div></button>
+        <button class="tile" data-act="portfolio"><div class="ic">🖼</div><div class="t">Աշխատանքներ</div><div class="s">Լուսանկարներ</div></button>
+        <button class="tile" data-go="address"><div class="ic">📍</div><div class="t">Հասցե</div><div class="s">Վանաձոր</div></button>
+        <button class="tile" data-link="https://instagram.com/${esc(D.ig)}"><div class="ic">📸</div><div class="t">Instagram</div><div class="s">@${esc(D.ig)}</div></button>
+        <button class="tile wide" data-go="phone"><div class="ic">📞</div><div><div class="t">Զանգահարել</div><div class="s">${esc(D.ph)}</div></div></button>
+      </div>`;
+  },
+
+  services() {
+    return `${backLink()}${steps(1)}<h2>Ընտրեք ծառայությունը</h2>
+      <div class="stack">${D.svc.map(([k, n, p, m]) => `
+        <button class="tile svc" data-svc="${k}">
+          <div class="em">${SVC_EMOJI[k] || "💅"}</div>
+          <div><div class="nm">${esc(n)}</div><div class="s">~${dur(m)}</div></div>
+          <div class="pr">${money(p)}</div>
+        </button>`).join("")}</div>`;
+  },
+
+  calendar() {
+    const s = svc(state.svc);
+    const lead = weekday(1);
+    let cells = WD.map(w => `<div class="wd">${w}</div>`).join("") + "<div></div>".repeat(lead);
+    let any = false;
+    for (let d = 1; d <= DAYS_IN_MONTH; d++) {
+      const ok = starts(d, s.min).length > 0; any ||= ok;
+      cells += `<button class="day ${ok ? "" : "off"} ${isToday(d) ? "today" : ""} ${state.day === d ? "sel" : ""}" ${ok ? `data-day="${d}"` : "disabled"}>${d}</button>`;
+    }
+    return `${backLink()}${steps(2)}${staleBanner()}<h2>Ընտրեք օրը</h2>
+      <div class="card">
+        <div class="cal-head"><b>${MONTHS[MONTH - 1]} ${YEAR}</b><span class="muted">${SVC_EMOJI[s.key] || ""} ${esc(s.name)}</span></div>
+        <div class="cal">${cells}</div>
+        <div class="legend"><span>Ազատ</span><span class="x">Զբաղված / փակ</span></div>
+      </div>
+      ${any ? "" : `<div class="empty">Այս ամսում ազատ օրեր չկան 😔<br>Զանգահարեք՝ ${esc(D.ph)}</div>`}`;
+  },
+
+  times() {
+    const s = svc(state.svc), list = starts(state.day, s.min);
+    const groups = [["🌤 Առավոտ", t => t < 720], ["☀️ Կեսօր", t => t >= 720 && t < 900], ["🌙 Երեկո", t => t >= 900]];
+    const body = groups.map(([label, f]) => {
+      const ts = list.filter(f);
+      return ts.length ? `<div class="group"><div class="gl">${label}</div><div class="chips">
+        ${ts.map(t => `<button class="chip ${state.time === t ? "sel" : ""}" data-time="${t}">${hm(t)}</button>`).join("")}
+      </div></div>` : "";
+    }).join("");
+    return `${backLink()}${steps(3)}${staleBanner()}<h2>Ընտրեք ժամը</h2>
+      <p class="muted">${state.day} ${MONTHS[MONTH - 1]}, ${WD_LONG[weekday(state.day)]} · ${esc(s.name)} (~${dur(s.min)})</p>
+      ${body || `<div class="empty">Ազատ ժամեր չկան</div>`}`;
+  },
+
+  confirm() {
+    const s = svc(state.svc);
+    return `${backLink()}${steps(4)}<h2>Ստուգեք և հաստատեք</h2>
+      <div class="card">
+        <div class="sum-row"><span>Ծառայություն</span><b>${SVC_EMOJI[s.key] || ""} ${esc(s.name)}</b></div>
+        <div class="sum-row"><span>Օր</span><b>${state.day} ${MONTHS[MONTH - 1]}, ${WD_LONG[weekday(state.day)]}</b></div>
+        <div class="sum-row"><span>Ժամ</span><b>${hm(state.time)} – ${hm(state.time + s.min)}</b></div>
+        <div class="sum-row"><span>Արժեք</span><b>${money(s.price)}</b></div>
+      </div>
+      <p class="muted">Հաստատելուց հետո բոտը կխնդրի ձեր հեռախոսահամարը, և գրանցումը կավարտվի։</p>
+      ${inTelegram ? "" : `<button class="btn" data-act="confirm">✅ Հաստատել գրանցումը</button>`}`;
+  },
+
+  prices() {
+    return `${backLink()}<h2>💰 Գներ</h2><div class="card">
+      ${D.svc.map(([k, n, p, m]) => `<div class="price-row"><div class="em" style="font-size:22px">${SVC_EMOJI[k] || "💅"}</div>
+        <div><b>${esc(n)}</b><div class="muted">~${dur(m)}</div></div><div class="pr">${money(p)}</div></div>`).join("")}
+      </div>${D.b ? "" : `<button class="btn" data-go="services">📅 Գրանցվել</button>`}`;
+  },
+
+  address() {
+    return `${backLink()}<h2>📍 Հասցե</h2>
+      <div class="card"><div style="font-size:18px;font-weight:600">${esc(D.ad)}</div>
+      <p class="muted">Աշխատում ենք ամեն օր՝ 09:00 – 19:00</p></div>
+      <div class="stack">
+        <button class="btn" data-link="${esc(D.gm)}">🗺 Բացել Google Maps-ում</button>
+        <button class="btn ghost" data-link="${esc(D.ym)}">🗺 Բացել Yandex Maps-ում</button>
+      </div>`;
+  },
+
+  phone() {
+    const tel = D.ph.replace(/[^\d+]/g, "");
+    return `${backLink()}<h2>📞 Կապ</h2>
+      <div class="card" style="text-align:center"><div class="muted">Վարպետի հեռախոսահամարը</div>
+      <div style="font-size:26px;font-weight:700;margin:8px 0">${esc(D.ph)}</div></div>
+      <div class="stack">
+        <a class="btn" href="tel:${tel}">📞 Զանգահարել</a>
+        <button class="btn ghost" data-act="copy">📋 Պատճենել համարը</button>
+      </div>`;
+  },
+};
+
+function render() {
+  app.innerHTML = `<div class="screen">${screens[state.screen]()}</div>`;
+  setupTelegramButtons();
+}
+
+app.addEventListener("click", e => {
+  const el = e.target.closest("button, a"); if (!el) return;
+  const ds = el.dataset;
+  if (ds.go) go(ds.go);
+  else if (ds.svc) go("calendar", { svc: ds.svc, day: null, time: null });
+  else if (ds.day) go("times", { day: +ds.day, time: null });
+  else if (ds.time) go("confirm", { time: +ds.time });
+  else if (ds.link) openLink(ds.link);
+  else if (ds.act === "confirm") confirmBooking();
+  else if (ds.act === "portfolio") send({ a: "portfolio" });
+  else if (ds.act === "refresh") send({ a: "refresh" });
+  else if (ds.act === "cancel") {
+    const ask = "Չեղարկե՞լ գրանցումը";
+    if (tg && tg.showConfirm) tg.showConfirm(ask, ok => ok && send({ a: "cancel" }));
+    else if (confirm(ask)) send({ a: "cancel" });
+  } else if (ds.act === "copy") {
+    navigator.clipboard && navigator.clipboard.writeText(D.ph);
+    tg && tg.showAlert ? tg.showAlert("Պատճենված է ✅") : alert("Պատճենված է ✅");
+  }
+});
+
+render();
+</script>
+</body>
+</html>
