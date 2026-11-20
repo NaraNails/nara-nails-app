@@ -93,8 +93,15 @@
   .svc .go { font-size: 12px; color: var(--accent); letter-spacing: .1em; text-transform: uppercase; text-align: right; opacity: 0; transition: opacity .15s; }
   .svc:active .go, .svc:hover .go { opacity: 1; }
 
-  .cal-head { display: flex; justify-content: space-between; align-items: baseline; padding-bottom: 14px; border-bottom: 1px solid var(--rule); }
+  .cal-head { display: flex; justify-content: space-between; align-items: center; padding-bottom: 14px; border-bottom: 1px solid var(--rule); }
   .cal-head .m { font: italic 500 26px var(--display); }
+  .cal-head .yr { font-style: normal; font-size: 16px; color: var(--ink-3); }
+  .mnavs { display: flex; gap: 6px; }
+  .mnav { width: 38px; height: 38px; border: 1px solid var(--rule); border-radius: 50%;
+    display: grid; place-items: center; font: 18px var(--display); text-align: center; transition: all .15s; }
+  .mnav:not([disabled]):active { background: var(--ink); color: var(--on-ink); border-color: var(--ink); }
+  .mnav[disabled] { opacity: .3; cursor: default; }
+  .inline { color: var(--accent); border-bottom: 1px solid currentColor; font-size: 13px; }
   .cal { display: grid; grid-template-columns: repeat(7, 1fr); row-gap: 6px; margin-top: 12px; }
   .cal .wd { text-align: center; font-size: 11px; color: var(--ink-3); padding: 6px 0 8px; letter-spacing: .04em; }
   .day { aspect-ratio: 1; display: grid; place-items: center; position: relative;
@@ -175,27 +182,42 @@ function nowYerevan() {
   return { y: +p.year, m: +p.month, d: +p.day, min: +p.hour * 60 + +p.minute };
 }
 const NOW = nowYerevan();
-const [YEAR, MONTH] = D.m ? D.m.split("-").map(Number) : [NOW.y, NOW.m];
-const DAYS_IN_MONTH = new Date(YEAR, MONTH, 0).getDate();
-const OPEN_DAYS = new Set(D.days || Array.from({ length: DAYS_IN_MONTH }, (_, i) => i + 1).filter(d => d >= NOW.d));
-const stale = Date.now() - D.g > STALE_MS || YEAR !== NOW.y || MONTH !== NOW.m;
-
 const pad = n => String(n).padStart(2, "0");
+const iso = (y, m, d) => `${y}-${pad(m)}-${pad(d)}`;
+const parseIso = s => s.split("-").map(Number);
+const TODAY = iso(NOW.y, NOW.m, NOW.d);
+const daysIn = (y, m) => new Date(y, m, 0).getDate();
+const addMonth = ({ y, m }, k) => { const t = (y * 12 + m - 1) + k; return { y: Math.floor(t / 12), m: t % 12 + 1 }; };
+
+// Bookable: today through end of next month (same rule as the bot).
+const MONTH_VIEWS = [{ y: NOW.y, m: NOW.m }, addMonth({ y: NOW.y, m: NOW.m }, 1)];
+if (!D.days) {  // demo data: every day open
+  D.days = [];
+  for (const { y, m } of MONTH_VIEWS) for (let d = 1; d <= daysIn(y, m); d++) if (iso(y, m, d) >= TODAY) D.days.push(iso(y, m, d));
+}
+const OPEN_DAYS = new Set(D.days);
+const stale = Date.now() - D.g > STALE_MS;
+
 const hm = min => `${pad(Math.floor(min / 60))}:${pad(min % 60)}`;
 const svc = key => { const s = D.svc.find(x => x[0] === key); return { key: s[0], name: s[1], price: s[2], min: s[3] }; };
 const dur = min => { const h = Math.floor(min / 60), m = min % 60; return h && m ? `${h},${m * 10 / 60} ժամ` : h ? `${h} ժամ` : `${m} րոպե`; };
 const money = n => n.toLocaleString("ru-RU").replace(/\s/g, " ") + " դր.";
 const weekday = (y, m, d) => (new Date(y, m - 1, d).getDay() + 6) % 7;
-const isPastDay = d => YEAR < NOW.y || (YEAR === NOW.y && (MONTH < NOW.m || (MONTH === NOW.m && d < NOW.d)));
-const isToday = d => YEAR === NOW.y && MONTH === NOW.m && d === NOW.d;
-const dateLong = (y, m, d) => `${d} ${MONTHS_GEN[m - 1]}, ${WD_LONG[weekday(y, m, d)]}`;
+const dateLong = s => { const [y, m, d] = parseIso(s); return `${d} ${MONTHS_GEN[m - 1]}, ${WD_LONG[weekday(y, m, d)]}`; };
 
-function starts(day, minutes) {
-  if (!OPEN_DAYS.has(day) || isPastDay(day)) return [];
+// Open the calendar on this month, or next month if this one is full.
+function firstView(key) {
+  const { y, m } = MONTH_VIEWS[0], min = svc(key).min;
+  for (let d = 1; d <= daysIn(y, m); d++) if (starts(iso(y, m, d), min).length) return 0;
+  return 1;
+}
+
+function starts(day, minutes) {  // day = "YYYY-MM-DD"
+  if (!OPEN_DAYS.has(day) || day < TODAY) return [];
   const busy = D.busy[day] || [];
   const out = [];
   for (let s = OPEN; s + minutes <= CLOSE; s += STEP) {
-    if (isToday(day) && s <= NOW.min) continue;
+    if (day === TODAY && s <= NOW.min) continue;
     if (busy.every(([b0, b1]) => s + minutes <= b0 || s >= b1)) out.push(s);
   }
   return out;
@@ -203,7 +225,7 @@ function starts(day, minutes) {
 
 /* ---------- helpers ---------- */
 const app = document.getElementById("app");
-const state = { screen: "home", svc: null, day: null, time: null };
+const state = { screen: "home", svc: null, day: null, time: null, view: 0 };
 const haptic = () => tg && tg.HapticFeedback && tg.HapticFeedback.selectionChanged && tg.HapticFeedback.selectionChanged();
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
@@ -226,7 +248,7 @@ function syncTelegram() {
   } else tg.MainButton.hide();
 }
 function confirmBooking() {
-  send({ a: "book", s: state.svc, t: `${YEAR}-${pad(MONTH)}-${pad(state.day)}T${hm(state.time)}` });
+  send({ a: "book", s: state.svc, t: `${state.day}T${hm(state.time)}` });
 }
 if (tg) {
   tg.ready(); tg.expand();
@@ -259,7 +281,7 @@ const screens = {
       const s = svc(D.b.s), [d, t] = D.b.t.split("T"), [y, m, dd] = d.split("-").map(Number);
       lead = `<div class="booking">
         <div class="eyebrow">Ձեր գրանցումը</div>
-        <div class="when">${dateLong(y, m, dd)}, ${t}</div>
+        <div class="when">${dateLong(d)}, ${t}</div>
         <div class="muted">${esc(s.name)} · ${money(s.price)}</div>
         <p class="small muted" style="margin:14px 0 0">Նոր գրանցման համար զանգահարեք՝ ${esc(D.ph)}</p>
         <button class="link" data-act="cancel">Չեղարկել գրանցումը</button>
@@ -296,17 +318,27 @@ const screens = {
   },
 
   calendar() {
-    const s = svc(state.svc);
-    let cells = WD.map(w => `<div class="wd">${w}</div>`).join("") + "<div></div>".repeat(weekday(YEAR, MONTH, 1));
+    const s = svc(state.svc), { y, m } = MONTH_VIEWS[state.view];
+    let cells = WD.map(w => `<div class="wd">${w}</div>`).join("") + "<div></div>".repeat(weekday(y, m, 1));
     let any = false;
-    for (let d = 1; d <= DAYS_IN_MONTH; d++) {
-      const ok = starts(d, s.min).length > 0; any ||= ok;
-      cells += `<button class="day ${ok ? "" : "off"} ${isToday(d) ? "today" : ""} ${state.day === d ? "sel" : ""}" ${ok ? `data-day="${d}"` : "disabled"}>${d}</button>`;
+    for (let d = 1; d <= daysIn(y, m); d++) {
+      const key = iso(y, m, d), ok = starts(key, s.min).length > 0; any ||= ok;
+      cells += `<button class="day ${ok ? "" : "off"} ${key === TODAY ? "today" : ""} ${state.day === key ? "sel" : ""}" ${ok ? `data-day="${key}"` : "disabled"}>${d}</button>`;
     }
+    const nav = (k, label) => {
+      const target = state.view + k, ok = target >= 0 && target < MONTH_VIEWS.length;
+      return `<button class="mnav" ${ok ? `data-view="${target}"` : "disabled"} aria-label="${label}">${k < 0 ? "←" : "→"}</button>`;
+    };
+    const other = MONTH_VIEWS[1 - state.view];
     return `${topBar(2)}${staleBanner()}${stepLabel(2, "Օր")}<h2>Ո՞ր օրը</h2>
-      <div class="cal-head"><span class="m">${MONTHS[MONTH - 1]}</span><span class="small muted">${esc(s.name)} · ${dur(s.min)}</span></div>
+      <div class="cal-head">
+        <span class="m">${MONTHS[m - 1]}${y !== NOW.y ? ` <span class="yr">${y}</span>` : ""}</span>
+        <span class="mnavs">${nav(-1, "Նախորդ ամիս")}${nav(1, "Հաջորդ ամիս")}</span>
+      </div>
       <div class="cal">${cells}</div>
-      <p class="note">${any ? "Գունատ օրերին ազատ ժամ չկա։" : `Այս ամսում ազատ օրեր այլևս չկան։ Զանգահարեք՝ ${esc(D.ph)}`}</p>`;
+      <p class="note">${any ? `Գունատ օրերին ազատ ժամ չկա։ ${state.view === 0 ? "Հաջորդ ամիսը՝ →" : ""}`
+        : `${MONTHS[m - 1]}ին ազատ օրեր չկան։ <button class="inline" data-view="${1 - state.view}">Դիտել ${MONTHS_GEN[other.m - 1].replace(/ի$/, "ը")}</button>`}</p>
+      <p class="note">${esc(s.name)} · մոտ ${dur(s.min)}</p>`;
   },
 
   times() {
@@ -319,7 +351,7 @@ const screens = {
       </div></div>` : "";
     }).join("");
     return `${topBar(3)}${staleBanner()}${stepLabel(3, "Ժամ")}<h2>Ո՞ր ժամին</h2>
-      <p class="small muted" style="margin:-12px 0 22px">${dateLong(YEAR, MONTH, state.day)}</p>
+      <p class="small muted" style="margin:-12px 0 22px">${dateLong(state.day)}</p>
       ${body || `<div class="empty">Այս օրը ազատ ժամեր այլևս չկան։</div>`}`;
   },
 
@@ -329,7 +361,7 @@ const screens = {
     return `${topBar(4)}${stepLabel(4, "Հաստատում")}<h2>Ամեն ինչ ճի՞շտ է</h2>
       <div class="receipt">
         ${line("Ծառայություն", esc(s.name))}
-        ${line("Օր", dateLong(YEAR, MONTH, state.day))}
+        ${line("Օր", dateLong(state.day))}
         ${line("Ժամ", `<span class="num">${hm(state.time)} – ${hm(state.time + s.min)}</span>`)}
         ${line("Արժեք", `<span class="num">${money(s.price)}</span>`, "total")}
       </div>
@@ -379,8 +411,9 @@ app.addEventListener("click", e => {
   else if (ds.nav === "portfolio") send({ a: "portfolio" });
   else if (ds.nav === "instagram") openLink("https://instagram.com/" + D.ig);
   else if (ds.nav) go(ds.nav);
-  else if (ds.svc) go("calendar", { svc: ds.svc, day: null, time: null });
-  else if (ds.day) go("times", { day: +ds.day, time: null });
+  else if (ds.view !== undefined) go("calendar", { view: +ds.view });
+  else if (ds.svc) go("calendar", { svc: ds.svc, day: null, time: null, view: firstView(ds.svc) });
+  else if (ds.day) go("times", { day: ds.day, time: null });
   else if (ds.time) go("confirm", { time: +ds.time });
   else if (ds.link) openLink(ds.link);
   else if (ds.act === "confirm") confirmBooking();
