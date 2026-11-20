@@ -171,7 +171,11 @@ const MONTHS = ["Հունվար","Փետրվար","Մարտ","Ապրիլ","Մա�
 const MONTHS_GEN = ["հունվարի","փետրվարի","մարտի","ապրիլի","մայիսի","հունիսի","հուլիսի","օգոստոսի","սեպտեմբերի","հոկտեմբերի","նոյեմբերի","դեկտեմբերի"];
 const WD = ["Երկ","Երք","Չրք","Հնգ","Ուր","Շբթ","Կիր"];
 const WD_LONG = ["երկուշաբթի","երեքշաբթի","չորեքշաբթի","հինգշաբթի","ուրբաթ","շաբաթ","կիրակի"];
-const OPEN = 9 * 60, CLOSE = 19 * 60, STEP = 30, STALE_MS = 15 * 60 * 1000;
+const OPEN = 9 * 60, CLOSE = 19 * 60, STEP = 30;
+// Free times are baked into the button URL when the bot last sent the menu.
+// Older than this -> fetch fresh ones before booking (a just-refreshed snapshot is
+// trusted longer, so a phone with a wrong clock can't loop forever).
+const STALE_MS = 2 * 60 * 1000, REFRESHED_OK_MS = 30 * 60 * 1000;
 
 /* ---------- time (Asia/Yerevan, same rules as the bot) ---------- */
 function nowYerevan() {
@@ -196,7 +200,7 @@ if (!D.days) {  // demo data: every day open
   for (const { y, m } of MONTH_VIEWS) for (let d = 1; d <= daysIn(y, m); d++) if (iso(y, m, d) >= TODAY) D.days.push(iso(y, m, d));
 }
 const OPEN_DAYS = new Set(D.days);
-const stale = Date.now() - D.g > STALE_MS;
+const isStale = () => Date.now() - D.g > (D.r ? REFRESHED_OK_MS : STALE_MS);
 
 const hm = min => `${pad(Math.floor(min / 60))}:${pad(min % 60)}`;
 const svc = key => { const s = D.svc.find(x => x[0] === key); return { key: s[0], name: s[1], price: s[2], min: s[3] }; };
@@ -264,10 +268,16 @@ const topBar = step => `<div class="top">
     ${step ? `<div class="progress">${[1,2,3,4].map(i => `<i class="${i <= step ? "on" : ""}"></i>`).join("")}</div>` : ""}
   </div>`;
 const stepLabel = (n, t) => `<div class="eyebrow">${pad(n)} — ${t}</div>`;
-const staleBanner = () => stale ? `<div class="banner">Ժամերը կարող են փոխված լինել<button data-act="refresh">Թարմացնել</button></div>` : "";
+const staleBanner = () => "";
 
 /* ---------- screens ---------- */
 const screens = {
+  refreshing() {
+    return `<div class="mast"><div class="eyebrow">Մի պահ</div>
+      <h2 style="margin-top:14px">Թարմացնում ենք ազատ ժամերը…</h2>
+      <p class="muted">Պատուհանը կփակվի։ Հետո կրկին սեղմեք «📅 Գրանցվել» ներքևում։</p></div>`;
+  },
+
   home() {
     const rows = [
       ["prices", "Գներ", `${D.svc.length} ծառայություն`, "→"],
@@ -407,7 +417,8 @@ function render() {
 app.addEventListener("click", e => {
   const el = e.target.closest("button, a"); if (!el || el.disabled) return;
   const ds = el.dataset;
-  if (ds.go) go(ds.go);
+  if (ds.go === "services" && isStale()) { go("refreshing"); setTimeout(() => send({ a: "refresh" }), 400); }
+  else if (ds.go) go(ds.go);
   else if (ds.nav === "portfolio") send({ a: "portfolio" });
   else if (ds.nav === "instagram") openLink("https://instagram.com/" + D.ig);
   else if (ds.nav) go(ds.nav);
