@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>Nara Nails</title>
+<title>Nara Nail Artist</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -50,7 +50,7 @@
 
   /* ---- home ---- */
   .mast { padding: 18px 0 30px; }
-  .mark { font: italic 400 58px/0.95 var(--display); letter-spacing: -.01em; margin: 14px 0 0; }
+  .mark { font: italic 400 56px/0.95 var(--display); letter-spacing: -.01em; margin: 6px 0 0; }
   .mark span { display: block; padding-left: 38px; }
   .tag { margin-top: 18px; color: var(--ink-2); max-width: 260px; }
   .facts { display: flex; gap: 22px; margin-top: 22px; }
@@ -127,7 +127,10 @@
   .line b { font: 400 16px var(--serif); text-align: right; }
   .line.total b { font-size: 20px; font-weight: 500; }
 
-  .price { display: grid; grid-template-columns: auto 1fr auto; align-items: baseline; gap: 10px; padding: 16px 0; border-bottom: 1px solid var(--rule); }
+  .price { display: grid; grid-template-columns: minmax(0, max-content) minmax(14px, 1fr) max-content; align-items: baseline; gap: 10px; padding: 16px 0; border-bottom: 1px solid var(--rule); }
+  .price .pr, .svc .pr, .line b { white-space: nowrap; }
+  .svc { grid-template-columns: minmax(0, 1fr) auto; }
+  .line span { white-space: normal; }
   .price .nm { font: 400 18px var(--serif); }
   .price .dots { border-bottom: 1px dotted var(--ink-3); transform: translateY(-5px); }
   .price .pr { font: 500 17px var(--serif); }
@@ -159,7 +162,8 @@ function decode(s) {
 }
 const DEMO = {
   g: Date.now(), m: null, days: null, busy: {}, b: null,
-  svc: [["gel","Գել-լաք",3000,90],["clean","Մաքրում",1000,45],["fill","Լիցք",5000,150],["pedi","Պեդիկյուր",5000,90]],
+  svc: [["gel","Գել-լաք + մաքրում",4000,90,null],["clean","Մաքրում",1000,45,null],["fill","Լիցք",6000,150,8000],["pedi","Պեդիկյուր",4000,90,6000]],
+  iu: "https://www.instagram.com/nara_nailartist?dmpr=amd2cThtY3o0am5x&utm_source=qr",
   ph: "+374 91 743 389", ig: "nara_nailartist", ad: "ք. Վանաձոր, Զորավար Անդրանիկի 95",
   gm: "https://www.google.com/maps/search/?api=1&query=Vanadzor%2C%20Zoravar%20Andranik%2095",
   ym: "https://yandex.com/maps/?text=Vanadzor%2C%20Zoravar%20Andranik%2095",
@@ -197,15 +201,16 @@ const addMonth = ({ y, m }, k) => { const t = (y * 12 + m - 1) + k; return { y: 
 const MONTH_VIEWS = [{ y: NOW.y, m: NOW.m }, addMonth({ y: NOW.y, m: NOW.m }, 1)];
 if (!D.days) {  // demo data: every day open
   D.days = [];
-  for (const { y, m } of MONTH_VIEWS) for (let d = 1; d <= daysIn(y, m); d++) if (iso(y, m, d) >= TODAY) D.days.push(iso(y, m, d));
+  for (const { y, m } of MONTH_VIEWS) for (let d = 1; d <= daysIn(y, m); d++) if (iso(y, m, d) > TODAY) D.days.push(iso(y, m, d));
 }
 const OPEN_DAYS = new Set(D.days);
 const isStale = () => Date.now() - D.g > (D.r ? REFRESHED_OK_MS : STALE_MS);
 
 const hm = min => `${pad(Math.floor(min / 60))}:${pad(min % 60)}`;
-const svc = key => { const s = D.svc.find(x => x[0] === key); return { key: s[0], name: s[1], price: s[2], min: s[3] }; };
+const svc = key => { const s = D.svc.find(x => x[0] === key); return { key: s[0], name: s[1], price: s[2], min: s[3], max: s[4] }; };
 const dur = min => { const h = Math.floor(min / 60), m = min % 60; return h && m ? `${h},${m * 10 / 60} ժամ` : h ? `${h} ժամ` : `${m} րոպե`; };
-const money = n => n.toLocaleString("ru-RU").replace(/\s/g, " ") + " դր.";
+const num = n => n.toLocaleString("ru-RU").replace(/\s/g, " ");
+const money = (n, max) => (max ? `${num(n)}–${num(max)}` : num(n)) + " դր.";
 const weekday = (y, m, d) => (new Date(y, m - 1, d).getDay() + 6) % 7;
 const dateLong = s => { const [y, m, d] = parseIso(s); return `${d} ${MONTHS_GEN[m - 1]}, ${WD_LONG[weekday(y, m, d)]}`; };
 
@@ -217,11 +222,10 @@ function firstView(key) {
 }
 
 function starts(day, minutes) {  // day = "YYYY-MM-DD"
-  if (!OPEN_DAYS.has(day) || day < TODAY) return [];
+  if (!OPEN_DAYS.has(day) || day <= TODAY) return [];  // no same-day booking
   const busy = D.busy[day] || [];
   const out = [];
   for (let s = OPEN; s + minutes <= CLOSE; s += STEP) {
-    if (day === TODAY && s <= NOW.min) continue;
     if (busy.every(([b0, b1]) => s + minutes <= b0 || s >= b1)) out.push(s);
   }
   return out;
@@ -275,7 +279,7 @@ const screens = {
   refreshing() {
     return `<div class="mast"><div class="eyebrow">Մի պահ</div>
       <h2 style="margin-top:14px">Թարմացնում ենք ազատ ժամերը…</h2>
-      <p class="muted">Պատուհանը կփակվի։ Հետո կրկին սեղմեք «📅 Գրանցվել» ներքևում։</p></div>`;
+      <p class="muted">Պատուհանը կփակվի։ Հետո կրկին սեղմեք «Գրանցվել» ներքևում։</p></div>`;
   },
 
   home() {
@@ -292,7 +296,7 @@ const screens = {
       lead = `<div class="booking">
         <div class="eyebrow">Ձեր գրանցումը</div>
         <div class="when">${dateLong(d)}, ${t}</div>
-        <div class="muted">${esc(s.name)} · ${money(s.price)}</div>
+        <div class="muted">${esc(s.name)} · ${money(s.price, s.max)}</div>
         <p class="small muted" style="margin:14px 0 0">Նոր գրանցման համար զանգահարեք՝ ${esc(D.ph)}</p>
         <button class="link" data-act="cancel">Չեղարկել գրանցումը</button>
       </div>`;
@@ -301,11 +305,10 @@ const screens = {
     }
     return `
       <div class="mast">
-        <div class="eyebrow">Մատնահարդարման ստուդիա · Վանաձոր</div>
-        <h1 class="mark">Nara<span>Nails</span></h1>
-        <p class="tag">Մանիկյուր, լիցք և պեդիկյուր՝ խնամքով և ուշադրությամբ։</p>
+        <h1 class="mark">Nara<span>Nail Artist</span></h1>
+        <p class="tag">Մատնահարդարում, լիցք, ոտնահարդարում՝ խնամքով և ուշադրությամբ։</p>
         <div class="facts">
-          <div><b>09:00 – 19:00</b><span>ամեն օր</span></div>
+          <div><b>09:00 – 19:00</b><span>աշխատանքային ժամեր</span></div>
           <div><b>Զ. Անդրանիկի 95</b><span>Վանաձոր</span></div>
         </div>
       </div>
@@ -320,9 +323,9 @@ const screens = {
 
   services() {
     return `${topBar(1)}${stepLabel(1, "Ծառայություն")}<h2>Ի՞նչ ենք անելու</h2>
-      ${D.svc.map(([k, n, p, m]) => `
+      ${D.svc.map(([k, n, p, m, mx]) => `
         <button class="svc" data-svc="${k}">
-          <span class="nm">${esc(n)}</span><span class="pr num">${money(p)}</span>
+          <span class="nm">${esc(n)}</span><span class="pr num">${money(p, mx)}</span>
           <span class="du">մոտ ${dur(m)}</span><span class="go">Ընտրել</span>
         </button>`).join("")}`;
   },
@@ -373,7 +376,7 @@ const screens = {
         ${line("Ծառայություն", esc(s.name))}
         ${line("Օր", dateLong(state.day))}
         ${line("Ժամ", `<span class="num">${hm(state.time)} – ${hm(state.time + s.min)}</span>`)}
-        ${line("Արժեք", `<span class="num">${money(s.price)}</span>`, "total")}
+        ${line("Արժեք", `<span class="num">${money(s.price, s.max)}</span>`, "total")}
       </div>
       <p class="small muted" style="margin-top:18px">Հաստատելուց հետո բոտը կխնդրի ձեր հեռախոսահամարը։</p>
       ${inTelegram ? "" : `<button class="btn solid" data-act="confirm">Հաստատել գրանցումը</button>`}`;
@@ -381,16 +384,17 @@ const screens = {
 
   prices() {
     return `${topBar(0)}<div class="eyebrow">Գնացուցակ</div><h2>Գներ</h2>
-      ${D.svc.map(([k, n, p, m]) => `<div class="price">
-        <span class="nm">${esc(n)}</span><i class="dots"></i><span class="pr num">${money(p)}</span>
+      ${D.svc.map(([k, n, p, m, mx]) => `<div class="price">
+        <span class="nm">${esc(n)}</span><i class="dots"></i><span class="pr num">${money(p, mx)}</span>
         <span class="du">մոտ ${dur(m)}</span></div>`).join("")}
+      <p class="note">Լիցքի և պեդիկյուրի գինը կախված է աշխատանքից։</p>
       ${D.b ? "" : `<button class="btn solid" data-go="services" style="margin-top:28px">Գրանցվել այցի</button>`}`;
   },
 
   address() {
     return `${topBar(0)}<div class="eyebrow">Ինչպես գտնել</div><h2>Հասցե</h2>
       <div class="big">${esc(D.ad)}</div>
-      <p class="muted small">Ընդունում ենք ամեն օր՝ 09:00-ից 19:00</p>
+      <p class="muted small">Աշխատանքային ժամեր՝ 09:00 – 19:00</p>
       <div style="margin-top:28px">
         <button class="btn solid" data-link="${esc(D.gm)}">Բացել Google Maps-ում</button>
         <button class="btn" data-link="${esc(D.ym)}">Բացել Yandex Maps-ում</button>
@@ -401,7 +405,7 @@ const screens = {
     const tel = D.ph.replace(/[^\d+]/g, "");
     return `${topBar(0)}<div class="eyebrow">Կապ վարպետի հետ</div><h2>Զանգահարել</h2>
       <div class="big num">${esc(D.ph)}</div>
-      <p class="muted small">Զանգահարեք նաև, եթե ցանկանում եք գրանցվել հաջորդ ամսվա համար։</p>
+      <p class="muted small">Զանգեք, եթե հարց ունեք կամ ուզում եք ավելի մոտ օր, քան կա օրացույցում։</p>
       <div style="margin-top:28px">
         <a class="btn solid" href="tel:${tel}">Զանգահարել</a>
         <button class="btn" data-act="copy">Պատճենել համարը</button>
@@ -420,7 +424,7 @@ app.addEventListener("click", e => {
   if (ds.go === "services" && isStale()) { go("refreshing"); setTimeout(() => send({ a: "refresh" }), 400); }
   else if (ds.go) go(ds.go);
   else if (ds.nav === "portfolio") send({ a: "portfolio" });
-  else if (ds.nav === "instagram") openLink("https://instagram.com/" + D.ig);
+  else if (ds.nav === "instagram") openLink(D.iu || "https://instagram.com/" + D.ig);
   else if (ds.nav) go(ds.nav);
   else if (ds.view !== undefined) go("calendar", { view: +ds.view });
   else if (ds.svc) go("calendar", { svc: ds.svc, day: null, time: null, view: firstView(ds.svc) });
