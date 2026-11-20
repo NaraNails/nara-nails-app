@@ -5,121 +5,135 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>Nara Nails</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;1,400;1,500&family=Noto+Serif+Armenian:wght@400;500&family=Noto+Sans+Armenian:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #fbf6f3;
-    --card: #ffffff;
-    --text: #2b1f1d;
-    --muted: #8c7a75;
-    --line: #efe3de;
-    --accent: #c9787a;
-    --accent-2: #e8b4a8;
-    --accent-soft: #f7e4df;
-    --ok: #5a9e7a;
-    --shadow: 0 6px 24px rgba(120, 70, 60, .08);
+    --paper: #f5f0ea;
+    --paper-2: #ede6de;
+    --ink: #1f1a17;
+    --ink-2: #5d5550;
+    --ink-3: #a39a93;
+    --rule: #ddd4ca;
+    --accent: #8a3b2c;
+    --on-ink: #f5f0ea;
+    --serif: "Noto Serif Armenian", Georgia, serif;
+    --display: "Cormorant Garamond", "Noto Serif Armenian", Georgia, serif;
+    --sans: "Noto Sans Armenian", system-ui, -apple-system, sans-serif;
   }
   :root.dark {
-    --bg: #1b1617;
-    --card: #262021;
-    --text: #f5ece9;
-    --muted: #a8958f;
-    --line: #382e2f;
-    --accent: #e0989a;
-    --accent-2: #b8736c;
-    --accent-soft: #3a2a2b;
-    --shadow: 0 6px 24px rgba(0, 0, 0, .3);
+    --paper: #171412;
+    --paper-2: #211d1a;
+    --ink: #eee6dd;
+    --ink-2: #b3a89f;
+    --ink-3: #6f665f;
+    --rule: #332d29;
+    --accent: #d08b74;
+    --on-ink: #171412;
   }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  html, body { margin: 0; background: var(--bg); color: var(--text);
-    font: 16px/1.4 system-ui, -apple-system, "Segoe UI", "Noto Sans Armenian", Roboto, sans-serif; }
-  body { min-height: 100vh; }
-  .wrap { max-width: 480px; margin: 0 auto; padding: 16px 16px 100px; }
-  .screen { animation: in .28s ease; }
-  @keyframes in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  html, body { margin: 0; background: var(--paper); color: var(--ink);
+    font: 15px/1.5 var(--sans); -webkit-font-smoothing: antialiased; }
+  button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; text-align: inherit; }
+  a { color: inherit; text-decoration: none; }
+  .wrap { max-width: 460px; margin: 0 auto; padding: 28px 22px 110px; }
+  .screen { animation: in .35s cubic-bezier(.2,.7,.2,1); }
+  @keyframes in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 
-  /* hero */
-  .hero { text-align: center; padding: 28px 16px 22px; border-radius: 24px;
-    background: linear-gradient(135deg, var(--accent-2), var(--accent)); color: #fff; box-shadow: var(--shadow); }
-  .hero .logo { font-size: 44px; }
-  .hero h1 { margin: 6px 0 2px; font-size: 26px; letter-spacing: .5px; }
-  .hero p { margin: 0; opacity: .92; font-size: 14px; }
+  .eyebrow { font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--ink-3); }
+  .rule { height: 1px; background: var(--rule); border: 0; margin: 0; }
+  h2 { font: 500 26px/1.2 var(--serif); margin: 6px 0 22px; letter-spacing: -.01em; }
+  .muted { color: var(--ink-2); }
+  .small { font-size: 13px; }
+  .num { font-variant-numeric: tabular-nums; }
 
-  .btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%;
-    border: 0; border-radius: 16px; padding: 16px; font: inherit; font-weight: 600; cursor: pointer;
-    background: var(--accent); color: #fff; box-shadow: var(--shadow); transition: transform .1s; }
-  .btn:active { transform: scale(.98); }
-  .btn.ghost { background: var(--card); color: var(--accent); }
-  .btn[disabled] { opacity: .5; }
-  .book-btn { margin: 16px 0; font-size: 18px; padding: 18px; }
+  /* ---- home ---- */
+  .mast { padding: 18px 0 30px; }
+  .mark { font: italic 400 58px/0.95 var(--display); letter-spacing: -.01em; margin: 14px 0 0; }
+  .mark span { display: block; padding-left: 38px; }
+  .tag { margin-top: 18px; color: var(--ink-2); max-width: 260px; }
+  .facts { display: flex; gap: 22px; margin-top: 22px; }
+  .facts div { font-size: 13px; }
+  .facts b { display: block; font-weight: 500; color: var(--ink); }
+  .facts span { color: var(--ink-3); }
 
-  .tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .tile { background: var(--card); border-radius: 18px; padding: 16px; box-shadow: var(--shadow);
-    cursor: pointer; transition: transform .1s; border: 0; font: inherit; color: inherit; text-align: left; }
-  .tile:active { transform: scale(.97); }
-  .tile .ic { font-size: 26px; }
-  .tile .t { font-weight: 600; margin-top: 6px; }
-  .tile .s { color: var(--muted); font-size: 13px; }
-  .tile.wide { grid-column: span 2; display: flex; align-items: center; gap: 12px; }
-  .tile.wide .t { margin: 0; }
+  .cta { display: flex; justify-content: space-between; align-items: center; width: 100%;
+    background: var(--ink); color: var(--on-ink); padding: 18px 20px; border-radius: 2px;
+    font-weight: 500; letter-spacing: .02em; transition: opacity .15s; }
+  .cta:active { opacity: .85; }
+  .cta .arr { font-family: var(--display); font-size: 22px; line-height: 1; }
 
-  .card { background: var(--card); border-radius: 18px; padding: 16px; box-shadow: var(--shadow); margin-bottom: 12px; }
-  .mybook { border: 2px solid var(--accent-2); }
-  .mybook .lbl { color: var(--accent); font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: .5px; }
-  .mybook .big { font-size: 18px; font-weight: 600; margin: 4px 0; }
-  .muted { color: var(--muted); font-size: 14px; }
+  .menu { margin-top: 30px; border-top: 1px solid var(--rule); }
+  .row { display: flex; align-items: baseline; gap: 14px; width: 100%; padding: 17px 0;
+    border-bottom: 1px solid var(--rule); transition: padding .15s; }
+  .row:active { padding-left: 6px; }
+  .row .n { font: italic 15px var(--display); color: var(--ink-3); width: 18px; }
+  .row .l { font: 400 17px var(--serif); }
+  .row .r { margin-left: auto; color: var(--ink-3); font-size: 13px; }
+  .row .r i { font-style: normal; font-family: var(--display); font-size: 18px; margin-left: 8px; color: var(--ink-2); }
 
-  h2 { font-size: 22px; margin: 8px 0 14px; }
-  .steps { display: flex; gap: 6px; margin-bottom: 14px; }
-  .steps i { flex: 1; height: 4px; border-radius: 2px; background: var(--line); }
-  .steps i.on { background: var(--accent); }
+  .booking { border: 1px solid var(--ink); padding: 20px; margin-bottom: 4px; }
+  .booking .when { font: 400 22px/1.25 var(--serif); margin: 8px 0 4px; }
+  .booking .link { margin-top: 16px; font-size: 13px; color: var(--accent); border-bottom: 1px solid currentColor; }
 
-  .svc { display: flex; align-items: center; gap: 14px; width: 100%; text-align: left; border: 2px solid transparent; }
-  .svc .em { width: 48px; height: 48px; border-radius: 14px; background: var(--accent-soft);
-    display: grid; place-items: center; font-size: 24px; flex: none; }
-  .svc .nm { font-weight: 600; font-size: 17px; }
-  .svc .pr { margin-left: auto; font-weight: 700; color: var(--accent); white-space: nowrap; }
+  /* ---- flow ---- */
+  .top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 26px; }
+  .back { font-size: 13px; color: var(--ink-2); }
+  .progress { display: flex; gap: 4px; }
+  .progress i { width: 18px; height: 2px; background: var(--rule); }
+  .progress i.on { background: var(--ink); }
 
-  /* calendar */
-  .cal-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-  .cal-head b { font-size: 18px; }
-  .cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
-  .cal .wd { text-align: center; font-size: 12px; color: var(--muted); padding: 4px 0; }
-  .day { aspect-ratio: 1; border-radius: 12px; border: 0; font: inherit; font-weight: 600;
-    background: var(--accent-soft); color: var(--text); cursor: pointer; position: relative; transition: transform .1s; }
-  .day:active { transform: scale(.92); }
-  .day.off { background: transparent; color: var(--muted); opacity: .45; cursor: default; font-weight: 400; }
-  .day.today::after { content: ""; position: absolute; left: 50%; bottom: 5px; width: 4px; height: 4px;
-    margin-left: -2px; border-radius: 50%; background: var(--accent); }
-  .day.sel { background: var(--accent); color: #fff; }
-  .legend { display: flex; gap: 14px; margin-top: 12px; font-size: 12px; color: var(--muted); }
-  .legend span::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 3px;
-    margin-right: 5px; vertical-align: -1px; background: var(--accent-soft); }
-  .legend span.x::before { background: transparent; border: 1px solid var(--line); }
+  .svc { display: grid; grid-template-columns: 1fr auto; gap: 2px 16px; width: 100%;
+    padding: 20px 0; border-bottom: 1px solid var(--rule); }
+  .svc:first-of-type { border-top: 1px solid var(--rule); }
+  .svc .nm { font: 400 20px var(--serif); }
+  .svc .pr { font: 500 17px var(--serif); align-self: end; }
+  .svc .du { font-size: 13px; color: var(--ink-3); }
+  .svc .go { font-size: 12px; color: var(--accent); letter-spacing: .1em; text-transform: uppercase; text-align: right; opacity: 0; transition: opacity .15s; }
+  .svc:active .go, .svc:hover .go { opacity: 1; }
 
-  .group { margin-bottom: 16px; }
-  .group .gl { font-size: 13px; color: var(--muted); margin-bottom: 8px; }
-  .chips { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-  .chip { border: 0; border-radius: 12px; padding: 12px 0; font: inherit; font-weight: 600;
-    background: var(--card); color: var(--text); box-shadow: var(--shadow); cursor: pointer; transition: all .12s; }
-  .chip.sel { background: var(--accent); color: #fff; transform: scale(1.04); }
+  .cal-head { display: flex; justify-content: space-between; align-items: baseline; padding-bottom: 14px; border-bottom: 1px solid var(--rule); }
+  .cal-head .m { font: italic 500 26px var(--display); }
+  .cal { display: grid; grid-template-columns: repeat(7, 1fr); row-gap: 6px; margin-top: 12px; }
+  .cal .wd { text-align: center; font-size: 11px; color: var(--ink-3); padding: 6px 0 8px; letter-spacing: .04em; }
+  .day { aspect-ratio: 1; display: grid; place-items: center; position: relative;
+    font: 400 16px var(--serif); font-variant-numeric: tabular-nums; border-radius: 50%; transition: background .15s, color .15s; }
+  .day.off { color: var(--ink-3); opacity: .55; cursor: default; }
+  .day.today::after { content: ""; position: absolute; bottom: 4px; width: 3px; height: 3px; border-radius: 50%; background: var(--accent); }
+  .day.sel { background: var(--ink); color: var(--on-ink); }
+  .day:not(.off):not(.sel):active { background: var(--paper-2); }
+  .note { margin-top: 18px; font-size: 13px; color: var(--ink-3); }
 
-  .sum-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--line); }
-  .sum-row:last-child { border: 0; }
-  .sum-row span { color: var(--muted); }
-  .sum-row b { text-align: right; }
+  .slot-group { margin-bottom: 22px; }
+  .slot-group .eyebrow { margin-bottom: 10px; }
+  .slots { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .slot { padding: 11px 0; text-align: center; border: 1px solid var(--rule); border-radius: 2px;
+    font-variant-numeric: tabular-nums; transition: all .15s; }
+  .slot:active { border-color: var(--ink-2); }
+  .slot.sel { background: var(--ink); border-color: var(--ink); color: var(--on-ink); }
 
-  .price-row { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line); }
-  .price-row:last-child { border: 0; }
-  .price-row .pr { margin-left: auto; font-weight: 700; color: var(--accent); }
+  .receipt { border-top: 1px solid var(--ink); border-bottom: 1px solid var(--ink); padding: 6px 0; }
+  .line { display: flex; align-items: baseline; gap: 8px; padding: 12px 0; }
+  .line span { color: var(--ink-2); font-size: 13px; white-space: nowrap; }
+  .line .dots { flex: 1; border-bottom: 1px dotted var(--ink-3); transform: translateY(-4px); }
+  .line b { font: 400 16px var(--serif); text-align: right; }
+  .line.total b { font-size: 20px; font-weight: 500; }
 
-  .banner { background: var(--accent-soft); border-radius: 14px; padding: 12px 14px; margin-bottom: 12px;
-    font-size: 14px; display: flex; align-items: center; gap: 10px; }
-  .banner button { margin-left: auto; border: 0; background: var(--accent); color: #fff; border-radius: 10px;
-    padding: 8px 12px; font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; }
-  .empty { text-align: center; padding: 30px 10px; color: var(--muted); }
-  .back { border: 0; background: none; color: var(--accent); font: inherit; font-weight: 600; padding: 4px 0 10px; cursor: pointer; }
-  a.btn { text-decoration: none; }
-  .stack > * + * { margin-top: 10px; }
+  .price { display: grid; grid-template-columns: auto 1fr auto; align-items: baseline; gap: 10px; padding: 16px 0; border-bottom: 1px solid var(--rule); }
+  .price .nm { font: 400 18px var(--serif); }
+  .price .dots { border-bottom: 1px dotted var(--ink-3); transform: translateY(-5px); }
+  .price .pr { font: 500 17px var(--serif); }
+  .price .du { grid-column: 1 / -1; font-size: 13px; color: var(--ink-3); margin-top: -6px; }
+
+  .big { font: 400 30px/1.2 var(--serif); margin: 6px 0 8px; }
+  .btn { display: block; width: 100%; padding: 16px; text-align: center; border: 1px solid var(--ink); border-radius: 2px; font-weight: 500; margin-top: 10px; }
+  .btn.solid { background: var(--ink); color: var(--on-ink); }
+
+  .banner { display: flex; align-items: center; gap: 12px; padding: 12px 0; margin: -10px 0 18px; border-bottom: 1px solid var(--rule); font-size: 13px; color: var(--ink-2); }
+  .banner button { margin-left: auto; color: var(--accent); font-weight: 500; border-bottom: 1px solid currentColor; }
+  .empty { padding: 26px 0; color: var(--ink-2); font-size: 14px; }
+  .foot { margin-top: 40px; text-align: center; font: italic 15px var(--display); color: var(--ink-3); }
 </style>
 </head>
 <body>
@@ -146,10 +160,10 @@ const DEMO = {
 let D;
 try { D = decode(new URLSearchParams(location.search).get("d")); } catch (e) { D = DEMO; }
 
-const SVC_EMOJI = { gel: "💅", clean: "✨", fill: "💎", pedi: "🦶" };
 const MONTHS = ["Հունվար","Փետրվար","Մարտ","Ապրիլ","Մայիս","Հունիս","Հուլիս","Օգոստոս","Սեպտեմբեր","Հոկտեմբեր","Նոյեմբեր","Դեկտեմբեր"];
+const MONTHS_GEN = ["հունվարի","փետրվարի","մարտի","ապրիլի","մայիսի","հունիսի","հուլիսի","օգոստոսի","սեպտեմբերի","հոկտեմբերի","նոյեմբերի","դեկտեմբերի"];
 const WD = ["Երկ","Երք","Չրք","Հնգ","Ուր","Շբթ","Կիր"];
-const WD_LONG = ["Երկուշաբթի","Երեքշաբթի","Չորեքշաբթի","Հինգշաբթի","Ուրբաթ","Շաբաթ","Կիրակի"];
+const WD_LONG = ["երկուշաբթի","երեքշաբթի","չորեքշաբթի","հինգշաբթի","ուրբաթ","շաբաթ","կիրակի"];
 const OPEN = 9 * 60, CLOSE = 19 * 60, STEP = 30, STALE_MS = 15 * 60 * 1000;
 
 /* ---------- time (Asia/Yerevan, same rules as the bot) ---------- */
@@ -170,10 +184,11 @@ const pad = n => String(n).padStart(2, "0");
 const hm = min => `${pad(Math.floor(min / 60))}:${pad(min % 60)}`;
 const svc = key => { const s = D.svc.find(x => x[0] === key); return { key: s[0], name: s[1], price: s[2], min: s[3] }; };
 const dur = min => { const h = Math.floor(min / 60), m = min % 60; return h && m ? `${h},${m * 10 / 60} ժամ` : h ? `${h} ժամ` : `${m} րոպե`; };
-const money = n => n.toLocaleString("ru-RU") + " դր.";
-const weekday = d => (new Date(YEAR, MONTH - 1, d).getDay() + 6) % 7;
+const money = n => n.toLocaleString("ru-RU").replace(/\s/g, " ") + " դր.";
+const weekday = (y, m, d) => (new Date(y, m - 1, d).getDay() + 6) % 7;
 const isPastDay = d => YEAR < NOW.y || (YEAR === NOW.y && (MONTH < NOW.m || (MONTH === NOW.m && d < NOW.d)));
 const isToday = d => YEAR === NOW.y && MONTH === NOW.m && d === NOW.d;
+const dateLong = (y, m, d) => `${d} ${MONTHS_GEN[m - 1]}, ${WD_LONG[weekday(y, m, d)]}`;
 
 function starts(day, minutes) {
   if (!OPEN_DAYS.has(day) || isPastDay(day)) return [];
@@ -189,12 +204,13 @@ function starts(day, minutes) {
 /* ---------- helpers ---------- */
 const app = document.getElementById("app");
 const state = { screen: "home", svc: null, day: null, time: null };
-const haptic = t => tg && tg.HapticFeedback && tg.HapticFeedback.selectionChanged && tg.HapticFeedback.selectionChanged();
+const haptic = () => tg && tg.HapticFeedback && tg.HapticFeedback.selectionChanged && tg.HapticFeedback.selectionChanged();
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
 
 function send(obj) {
   if (inTelegram) tg.sendData(JSON.stringify(obj));
-  else alert("Telegram-ից դուրս (preview)\n" + JSON.stringify(obj));
+  else alert("Preview (Telegram-ից դուրս)\n" + JSON.stringify(obj));
 }
 function openLink(url) { tg && tg.openLink ? tg.openLink(url) : window.open(url, "_blank"); }
 function go(screen, patch = {}) { Object.assign(state, patch, { screen }); haptic(); render(); window.scrollTo(0, 0); }
@@ -202,163 +218,180 @@ function go(screen, patch = {}) { Object.assign(state, patch, { screen }); hapti
 const BACK = { services: "home", calendar: "services", times: "calendar", confirm: "times",
                prices: "home", address: "home", phone: "home" };
 
-function setupTelegramButtons() {
+function syncTelegram() {
   if (!tg) return;
   if (BACK[state.screen]) tg.BackButton.show(); else tg.BackButton.hide();
-  const mb = tg.MainButton;
   if (state.screen === "confirm") {
-    mb.setParams({ text: "✅ Հաստատել գրանցումը", color: getComputedStyle(document.documentElement).getPropertyValue("--accent").trim(), text_color: "#ffffff", is_visible: true, is_active: true });
-  } else mb.hide();
+    tg.MainButton.setParams({ text: "Հաստատել գրանցումը", color: css("--ink"), text_color: css("--on-ink"), is_visible: true, is_active: true });
+  } else tg.MainButton.hide();
 }
 function confirmBooking() {
-  const t = `${YEAR}-${pad(MONTH)}-${pad(state.day)}T${hm(state.time)}`;
-  send({ a: "book", s: state.svc, t });
+  send({ a: "book", s: state.svc, t: `${YEAR}-${pad(MONTH)}-${pad(state.day)}T${hm(state.time)}` });
 }
 if (tg) {
   tg.ready(); tg.expand();
   if (tg.colorScheme === "dark") document.documentElement.classList.add("dark");
   tg.BackButton.onClick(() => go(BACK[state.screen] || "home"));
   tg.MainButton.onClick(confirmBooking);
+  const bg = () => { try { tg.setHeaderColor(css("--paper")); tg.setBackgroundColor(css("--paper")); } catch (e) {} };
+  bg();
 } else if (matchMedia("(prefers-color-scheme: dark)").matches) document.documentElement.classList.add("dark");
 
-const steps = n => `<div class="steps">${[1,2,3,4].map(i => `<i class="${i <= n ? "on" : ""}"></i>`).join("")}</div>`;
-const backLink = () => inTelegram ? "" : `<button class="back" data-go="${BACK[state.screen]}">‹ Հետ</button>`;
-const staleBanner = () => stale ? `<div class="banner">⏳ Ժամերը կարող են փոխված լինել։<button data-act="refresh">Թարմացնել</button></div>` : "";
+const topBar = step => `<div class="top">
+    ${inTelegram ? "<span></span>" : `<button class="back" data-go="${BACK[state.screen]}">← Հետ</button>`}
+    ${step ? `<div class="progress">${[1,2,3,4].map(i => `<i class="${i <= step ? "on" : ""}"></i>`).join("")}</div>` : ""}
+  </div>`;
+const stepLabel = (n, t) => `<div class="eyebrow">${pad(n)} — ${t}</div>`;
+const staleBanner = () => stale ? `<div class="banner">Ժամերը կարող են փոխված լինել<button data-act="refresh">Թարմացնել</button></div>` : "";
 
 /* ---------- screens ---------- */
 const screens = {
   home() {
-    let my = "";
+    const rows = [
+      ["prices", "Գներ", `${D.svc.length} ծառայություն`, "→"],
+      ["portfolio", "Աշխատանքներ", "լուսանկարներ", "→"],
+      ["address", "Հասցե", "Վանաձոր", "→"],
+      ["instagram", "Instagram", "@" + D.ig, "↗"],
+      ["phone", "Զանգահարել", D.ph, "→"],
+    ];
+    let lead;
     if (D.b) {
       const s = svc(D.b.s), [d, t] = D.b.t.split("T"), [y, m, dd] = d.split("-").map(Number);
-      my = `<div class="card mybook">
-        <div class="lbl">Ձեր գրանցումը</div>
-        <div class="big">${SVC_EMOJI[s.key] || "💅"} ${esc(s.name)}</div>
-        <div>${dd} ${MONTHS[m - 1]}, ${WD_LONG[(new Date(y, m - 1, dd).getDay() + 6) % 7]} · <b>${t}</b></div>
-        <p class="muted">Նոր գրանցման համար զանգահարեք վարպետին՝ ${esc(D.ph)}</p>
-        <button class="btn ghost" data-act="cancel">❌ Չեղարկել գրանցումը</button>
+      lead = `<div class="booking">
+        <div class="eyebrow">Ձեր գրանցումը</div>
+        <div class="when">${dateLong(y, m, dd)}, ${t}</div>
+        <div class="muted">${esc(s.name)} · ${money(s.price)}</div>
+        <p class="small muted" style="margin:14px 0 0">Նոր գրանցման համար զանգահարեք՝ ${esc(D.ph)}</p>
+        <button class="link" data-act="cancel">Չեղարկել գրանցումը</button>
       </div>`;
+    } else {
+      lead = `<button class="cta" data-go="services"><span>Գրանցվել այցի</span><span class="arr">→</span></button>`;
     }
     return `
-      <div class="hero"><div class="logo">💅</div><h1>Nara Nails</h1><p>Մատնահարդարում · Վանաձոր</p></div>
-      ${D.b ? `<div style="height:16px"></div>${my}` :
-        `<button class="btn book-btn" data-go="services">📅 Գրանցվել</button>`}
-      <div class="tiles">
-        <button class="tile" data-go="prices"><div class="ic">💰</div><div class="t">Գներ</div><div class="s">Ծառայություններ</div></button>
-        <button class="tile" data-act="portfolio"><div class="ic">🖼</div><div class="t">Աշխատանքներ</div><div class="s">Լուսանկարներ</div></button>
-        <button class="tile" data-go="address"><div class="ic">📍</div><div class="t">Հասցե</div><div class="s">Վանաձոր</div></button>
-        <button class="tile" data-link="https://instagram.com/${esc(D.ig)}"><div class="ic">📸</div><div class="t">Instagram</div><div class="s">@${esc(D.ig)}</div></button>
-        <button class="tile wide" data-go="phone"><div class="ic">📞</div><div><div class="t">Զանգահարել</div><div class="s">${esc(D.ph)}</div></div></button>
-      </div>`;
+      <div class="mast">
+        <div class="eyebrow">Մատնահարդարման ստուդիա · Վանաձոր</div>
+        <h1 class="mark">Nara<span>Nails</span></h1>
+        <p class="tag">Մանիկյուր, լիցք և պեդիկյուր՝ խնամքով և ուշադրությամբ։</p>
+        <div class="facts">
+          <div><b>09:00 – 19:00</b><span>ամեն օր</span></div>
+          <div><b>Զ. Անդրանիկի 95</b><span>Վանաձոր</span></div>
+        </div>
+      </div>
+      ${lead}
+      <div class="menu">
+        ${rows.map(([k, l, r, a], i) => `<button class="row" data-nav="${k}">
+          <span class="n">${i + 1}</span><span class="l">${l}</span><span class="r">${esc(r)}<i>${a}</i></span>
+        </button>`).join("")}
+      </div>
+      <div class="foot">— Nara —</div>`;
   },
 
   services() {
-    return `${backLink()}${steps(1)}<h2>Ընտրեք ծառայությունը</h2>
-      <div class="stack">${D.svc.map(([k, n, p, m]) => `
-        <button class="tile svc" data-svc="${k}">
-          <div class="em">${SVC_EMOJI[k] || "💅"}</div>
-          <div><div class="nm">${esc(n)}</div><div class="s">~${dur(m)}</div></div>
-          <div class="pr">${money(p)}</div>
-        </button>`).join("")}</div>`;
+    return `${topBar(1)}${stepLabel(1, "Ծառայություն")}<h2>Ի՞նչ ենք անելու</h2>
+      ${D.svc.map(([k, n, p, m]) => `
+        <button class="svc" data-svc="${k}">
+          <span class="nm">${esc(n)}</span><span class="pr num">${money(p)}</span>
+          <span class="du">մոտ ${dur(m)}</span><span class="go">Ընտրել</span>
+        </button>`).join("")}`;
   },
 
   calendar() {
     const s = svc(state.svc);
-    const lead = weekday(1);
-    let cells = WD.map(w => `<div class="wd">${w}</div>`).join("") + "<div></div>".repeat(lead);
+    let cells = WD.map(w => `<div class="wd">${w}</div>`).join("") + "<div></div>".repeat(weekday(YEAR, MONTH, 1));
     let any = false;
     for (let d = 1; d <= DAYS_IN_MONTH; d++) {
       const ok = starts(d, s.min).length > 0; any ||= ok;
       cells += `<button class="day ${ok ? "" : "off"} ${isToday(d) ? "today" : ""} ${state.day === d ? "sel" : ""}" ${ok ? `data-day="${d}"` : "disabled"}>${d}</button>`;
     }
-    return `${backLink()}${steps(2)}${staleBanner()}<h2>Ընտրեք օրը</h2>
-      <div class="card">
-        <div class="cal-head"><b>${MONTHS[MONTH - 1]} ${YEAR}</b><span class="muted">${SVC_EMOJI[s.key] || ""} ${esc(s.name)}</span></div>
-        <div class="cal">${cells}</div>
-        <div class="legend"><span>Ազատ</span><span class="x">Զբաղված / փակ</span></div>
-      </div>
-      ${any ? "" : `<div class="empty">Այս ամսում ազատ օրեր չկան 😔<br>Զանգահարեք՝ ${esc(D.ph)}</div>`}`;
+    return `${topBar(2)}${staleBanner()}${stepLabel(2, "Օր")}<h2>Ո՞ր օրը</h2>
+      <div class="cal-head"><span class="m">${MONTHS[MONTH - 1]}</span><span class="small muted">${esc(s.name)} · ${dur(s.min)}</span></div>
+      <div class="cal">${cells}</div>
+      <p class="note">${any ? "Գունատ օրերին ազատ ժամ չկա։" : `Այս ամսում ազատ օրեր այլևս չկան։ Զանգահարեք՝ ${esc(D.ph)}`}</p>`;
   },
 
   times() {
     const s = svc(state.svc), list = starts(state.day, s.min);
-    const groups = [["🌤 Առավոտ", t => t < 720], ["☀️ Կեսօր", t => t >= 720 && t < 900], ["🌙 Երեկո", t => t >= 900]];
+    const groups = [["Առավոտ", t => t < 720], ["Կեսօր", t => t >= 720 && t < 900], ["Երեկո", t => t >= 900]];
     const body = groups.map(([label, f]) => {
       const ts = list.filter(f);
-      return ts.length ? `<div class="group"><div class="gl">${label}</div><div class="chips">
-        ${ts.map(t => `<button class="chip ${state.time === t ? "sel" : ""}" data-time="${t}">${hm(t)}</button>`).join("")}
+      return ts.length ? `<div class="slot-group"><div class="eyebrow">${label}</div><div class="slots">
+        ${ts.map(t => `<button class="slot ${state.time === t ? "sel" : ""}" data-time="${t}">${hm(t)}</button>`).join("")}
       </div></div>` : "";
     }).join("");
-    return `${backLink()}${steps(3)}${staleBanner()}<h2>Ընտրեք ժամը</h2>
-      <p class="muted">${state.day} ${MONTHS[MONTH - 1]}, ${WD_LONG[weekday(state.day)]} · ${esc(s.name)} (~${dur(s.min)})</p>
-      ${body || `<div class="empty">Ազատ ժամեր չկան</div>`}`;
+    return `${topBar(3)}${staleBanner()}${stepLabel(3, "Ժամ")}<h2>Ո՞ր ժամին</h2>
+      <p class="small muted" style="margin:-12px 0 22px">${dateLong(YEAR, MONTH, state.day)}</p>
+      ${body || `<div class="empty">Այս օրը ազատ ժամեր այլևս չկան։</div>`}`;
   },
 
   confirm() {
     const s = svc(state.svc);
-    return `${backLink()}${steps(4)}<h2>Ստուգեք և հաստատեք</h2>
-      <div class="card">
-        <div class="sum-row"><span>Ծառայություն</span><b>${SVC_EMOJI[s.key] || ""} ${esc(s.name)}</b></div>
-        <div class="sum-row"><span>Օր</span><b>${state.day} ${MONTHS[MONTH - 1]}, ${WD_LONG[weekday(state.day)]}</b></div>
-        <div class="sum-row"><span>Ժամ</span><b>${hm(state.time)} – ${hm(state.time + s.min)}</b></div>
-        <div class="sum-row"><span>Արժեք</span><b>${money(s.price)}</b></div>
+    const line = (k, v, cls = "") => `<div class="line ${cls}"><span>${k}</span><i class="dots"></i><b>${v}</b></div>`;
+    return `${topBar(4)}${stepLabel(4, "Հաստատում")}<h2>Ամեն ինչ ճի՞շտ է</h2>
+      <div class="receipt">
+        ${line("Ծառայություն", esc(s.name))}
+        ${line("Օր", dateLong(YEAR, MONTH, state.day))}
+        ${line("Ժամ", `<span class="num">${hm(state.time)} – ${hm(state.time + s.min)}</span>`)}
+        ${line("Արժեք", `<span class="num">${money(s.price)}</span>`, "total")}
       </div>
-      <p class="muted">Հաստատելուց հետո բոտը կխնդրի ձեր հեռախոսահամարը, և գրանցումը կավարտվի։</p>
-      ${inTelegram ? "" : `<button class="btn" data-act="confirm">✅ Հաստատել գրանցումը</button>`}`;
+      <p class="small muted" style="margin-top:18px">Հաստատելուց հետո բոտը կխնդրի ձեր հեռախոսահամարը։</p>
+      ${inTelegram ? "" : `<button class="btn solid" data-act="confirm">Հաստատել գրանցումը</button>`}`;
   },
 
   prices() {
-    return `${backLink()}<h2>💰 Գներ</h2><div class="card">
-      ${D.svc.map(([k, n, p, m]) => `<div class="price-row"><div class="em" style="font-size:22px">${SVC_EMOJI[k] || "💅"}</div>
-        <div><b>${esc(n)}</b><div class="muted">~${dur(m)}</div></div><div class="pr">${money(p)}</div></div>`).join("")}
-      </div>${D.b ? "" : `<button class="btn" data-go="services">📅 Գրանցվել</button>`}`;
+    return `${topBar(0)}<div class="eyebrow">Գնացուցակ</div><h2>Գներ</h2>
+      ${D.svc.map(([k, n, p, m]) => `<div class="price">
+        <span class="nm">${esc(n)}</span><i class="dots"></i><span class="pr num">${money(p)}</span>
+        <span class="du">մոտ ${dur(m)}</span></div>`).join("")}
+      ${D.b ? "" : `<button class="btn solid" data-go="services" style="margin-top:28px">Գրանցվել այցի</button>`}`;
   },
 
   address() {
-    return `${backLink()}<h2>📍 Հասցե</h2>
-      <div class="card"><div style="font-size:18px;font-weight:600">${esc(D.ad)}</div>
-      <p class="muted">Աշխատում ենք ամեն օր՝ 09:00 – 19:00</p></div>
-      <div class="stack">
-        <button class="btn" data-link="${esc(D.gm)}">🗺 Բացել Google Maps-ում</button>
-        <button class="btn ghost" data-link="${esc(D.ym)}">🗺 Բացել Yandex Maps-ում</button>
+    return `${topBar(0)}<div class="eyebrow">Ինչպես գտնել</div><h2>Հասցե</h2>
+      <div class="big">${esc(D.ad)}</div>
+      <p class="muted small">Ընդունում ենք ամեն օր՝ 09:00-ից 19:00</p>
+      <div style="margin-top:28px">
+        <button class="btn solid" data-link="${esc(D.gm)}">Բացել Google Maps-ում</button>
+        <button class="btn" data-link="${esc(D.ym)}">Բացել Yandex Maps-ում</button>
       </div>`;
   },
 
   phone() {
     const tel = D.ph.replace(/[^\d+]/g, "");
-    return `${backLink()}<h2>📞 Կապ</h2>
-      <div class="card" style="text-align:center"><div class="muted">Վարպետի հեռախոսահամարը</div>
-      <div style="font-size:26px;font-weight:700;margin:8px 0">${esc(D.ph)}</div></div>
-      <div class="stack">
-        <a class="btn" href="tel:${tel}">📞 Զանգահարել</a>
-        <button class="btn ghost" data-act="copy">📋 Պատճենել համարը</button>
+    return `${topBar(0)}<div class="eyebrow">Կապ վարպետի հետ</div><h2>Զանգահարել</h2>
+      <div class="big num">${esc(D.ph)}</div>
+      <p class="muted small">Զանգահարեք նաև, եթե ցանկանում եք գրանցվել հաջորդ ամսվա համար։</p>
+      <div style="margin-top:28px">
+        <a class="btn solid" href="tel:${tel}">Զանգահարել</a>
+        <button class="btn" data-act="copy">Պատճենել համարը</button>
       </div>`;
   },
 };
 
 function render() {
   app.innerHTML = `<div class="screen">${screens[state.screen]()}</div>`;
-  setupTelegramButtons();
+  syncTelegram();
 }
 
 app.addEventListener("click", e => {
-  const el = e.target.closest("button, a"); if (!el) return;
+  const el = e.target.closest("button, a"); if (!el || el.disabled) return;
   const ds = el.dataset;
   if (ds.go) go(ds.go);
+  else if (ds.nav === "portfolio") send({ a: "portfolio" });
+  else if (ds.nav === "instagram") openLink("https://instagram.com/" + D.ig);
+  else if (ds.nav) go(ds.nav);
   else if (ds.svc) go("calendar", { svc: ds.svc, day: null, time: null });
   else if (ds.day) go("times", { day: +ds.day, time: null });
   else if (ds.time) go("confirm", { time: +ds.time });
   else if (ds.link) openLink(ds.link);
   else if (ds.act === "confirm") confirmBooking();
-  else if (ds.act === "portfolio") send({ a: "portfolio" });
   else if (ds.act === "refresh") send({ a: "refresh" });
   else if (ds.act === "cancel") {
     const ask = "Չեղարկե՞լ գրանցումը";
-    if (tg && tg.showConfirm) tg.showConfirm(ask, ok => ok && send({ a: "cancel" }));
+    if (tg && tg.showConfirm && inTelegram) tg.showConfirm(ask, ok => ok && send({ a: "cancel" }));
     else if (confirm(ask)) send({ a: "cancel" });
   } else if (ds.act === "copy") {
     navigator.clipboard && navigator.clipboard.writeText(D.ph);
-    tg && tg.showAlert ? tg.showAlert("Պատճենված է ✅") : alert("Պատճենված է ✅");
+    inTelegram ? tg.showAlert("Համարը պատճենված է") : alert("Համարը պատճենված է");
   }
 });
 
